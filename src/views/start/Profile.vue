@@ -1,6 +1,20 @@
 <template>
   <div>
     <h1 class="display-3">Welcome {{username}}</h1>
+
+<b-form-group>
+
+    <b-form-input id="username"
+                      type="text"
+                      v-model="usernameQuery"
+                      required
+                      placeholder="Search for user"
+                      size="lg"
+                      @change="fixUser(usernameQuery)"
+                      >
+        </b-form-input>
+</b-form-group>
+
     <b-list-group v-if="isAdmin">
       <b-list-group-item
         v-b-toggle="'userpart'+u.username"
@@ -44,6 +58,7 @@ export default {
       size: 5,
       totalSize: 10,
       isAdmin: false,
+      usernameQuery: ''
     };
   },
   methods: {
@@ -60,14 +75,50 @@ export default {
         .then(res => {
           console.log(res)
           if (res.status === 200) {
+            this.users = this.users.filter(u => {u.username==username})
           return res.json()
           }
         }).then(data => {
-          
           console.log(data)
         })
         .catch(err => {
           console.log(err)
+        });
+    },
+
+    fixUser(username){
+      console.log(username)
+      if(username!=null && username!=undefined && username!= ''){
+        console.log("hej allihoppa")
+        
+      }
+        const jo = new Request(
+        "http://localhost:9090/users?page=" + (this.page-1) + "&size=" + this.size
+      );
+      fetch(jo, {
+        headers: {
+          Authorization: "Bearer " + this.$cookies.get("token")
+        }
+      })
+        .then(res => {
+          if (res.status === 200) {
+            return res.json();
+          } else {
+            console.error();
+          }
+        })
+        .then(users => {
+          if (users === undefined || users.length === 0) {
+            //fix some kind of warningbox
+            this.users.push("No users")
+          } else {
+            this.users = users;
+            if(this.page > 1&& this.users.content.length==5)
+            this.totalSize += users.content.length
+          }
+        })
+        .catch(error => {
+          console.error(error);
         });
     },
 
@@ -95,35 +146,8 @@ export default {
   watch: {
     page: function(val) {
       console.log("it watched");
-      const jo = new Request(
-        "http://localhost:9090/users?page=" + (this.page-1) + "&size=" + this.size
-      );
-      fetch(jo, {
-        headers: {
-          Authorization: "Bearer " + this.$cookies.get("token")
-        }
-      })
-        .then(res => {
-          if (res.status === 200) {
-            return res.json();
-          } else {
-            console.error();
-          }
-        })
-        .then(users => {
-          if (users === undefined || users.length === 0) {
-            //fix some kind of warningbox
-            this.users.push("No users")
-          } else {
-            this.users = users;
-            if(this.page>1)
-            this.totalSize += users.content.length
-          }
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    }
+      this.fixUser()
+    },
   },
   mounted() {
     console.log("it mounts")

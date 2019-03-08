@@ -26,7 +26,6 @@
       <b-button type="submit" variant="primary">Submit</b-button>
       <b-button type="reset" variant="danger">Reset</b-button>
     </b-form>
-    <!-- <b-alert v-else-if="success==false" variant="danger" show>{{message}}</b-alert> -->
     <b-alert v-if="!success" variant="danger" show>{{message}}</b-alert>
   </div>
 </template>

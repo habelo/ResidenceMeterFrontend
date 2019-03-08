@@ -68,8 +68,6 @@ export default {
           if (res.status === 201) {
             this.success = true;
           }
-          //får ej ut responsetexten
-          // if (res.status === 409 || res.status === 400) {
           if (res.status != 201) {
             this.success = false;
           }
