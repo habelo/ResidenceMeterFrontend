@@ -30,6 +30,11 @@ export default new Router({
     path: '/profile',
     name: 'profile',
     component: () => import('./views/start/Profile.vue')
+    },
+    {
+    path: '/changepw',
+    name: 'changepw',
+    component: () => import('./views/start/ChangePassword.vue')
     }
   ]
 })

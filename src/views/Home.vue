@@ -17,9 +17,9 @@ import router from "@/router";
 
 export default {
 
+
 methods: {
   navigate(button){
-    this.$cookies.set("olle", "olle")
     if(button=='create')
     router.push({ name: "new-user"})
     if(button=='login')

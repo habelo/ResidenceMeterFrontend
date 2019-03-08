@@ -11,8 +11,8 @@
         <b-collapse :id="'userpart'+u.username" class="mt-2">
           <b-card>
             <p class="card-text">Created: {{u.created}}</p>
-            <b-button v-for="r in u.roles" v-b-toggle.collapse1_inner size="sm" variant="danger">Remove {{r}} role</b-button>
-            <b-button v-for="r in roles.content" v-bind:key="r.name" v-b-toggle.collapse1_inner size="sm">Add {{r.name}} role</b-button>
+            <b-button @click="fixRole(r, u.username, 'DELETE')" v-bind:key="r.name" v-for="r in u.roles" v-b-toggle.collapse1_inner size="sm" variant="danger">Remove {{r}} role</b-button>
+            <b-button @click="fixRole(r.name, u.username, 'PATCH')" v-for="r in roles.content" v-bind:key="r.name" v-b-toggle.collapse1_inner size="sm">Add {{r.name}} role</b-button>
             <b-collapse id="collapse1_inner" class="mt-2">
             </b-collapse>
           </b-card>
@@ -22,6 +22,7 @@
 
     <div>
       <b-pagination size="md" :total-rows="totalSize" v-model="page" :per-page="5"/>
+      <b-button variant="outline-primary" id="changepw" @click="navigate($event.srcElement.id)">Change Password</b-button>
       <b-button variant="outline-primary" id="logout" @click="navigate($event.srcElement.id)">Log Out</b-button>
     </div>
   </div>
@@ -31,6 +32,8 @@
 import router from "@/router";
 
 export default {
+
+
   data() {
     return {
       username: "",
@@ -40,21 +43,52 @@ export default {
       page: 0,
       size: 5,
       totalSize: 10,
-      isAdmin: false
+      isAdmin: false,
     };
   },
   methods: {
-    styleIfAdmin(u) {
-      if (u.roles.includes("ADMIN")) {
-        return "primary";
-      } else if (u.roles[0] == "USER") {
-        return "warning";
-      }
-      return "";
+    fixRole(role, username, method){
+      const req = new Request("http://127.0.0.1:9090/roles/"+username)
+      return fetch(req, {
+        method: method,
+        body: JSON.stringify(role),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + this.$cookies.get("token")
+          }
+      })
+        .then(res => {
+          console.log(res)
+          if (res.status === 200) {
+          return res.json()
+          }
+        }).then(data => {
+          
+          console.log(data)
+        })
+        .catch(err => {
+          console.log(err)
+        });
     },
+
+
+    styleIfAdmin(u) {
+
+      if (u.roles.includes("ADMIN")) {
+        return "primary"
+      } else if (u.roles[0] == "USER") {
+        return "warning"
+      }
+      return ""
+    },
+
+    
     navigate(id){
       if(id=="logout"){
         router.push({ name: "home"})
+      }
+      if(id=="changepw"){
+        router.push({name: "changepw"})
       }
     }
   },
@@ -66,7 +100,7 @@ export default {
       );
       fetch(jo, {
         headers: {
-          Authorization: "Bearer " + sessionStorage.getItem("token")
+          Authorization: "Bearer " + this.$cookies.get("token")
         }
       })
         .then(res => {
@@ -93,13 +127,13 @@ export default {
   },
   mounted() {
     console.log("it mounts")
-    this.username = sessionStorage.getItem("username");
+    this.username = this.$cookies.get("username");
          const jo = new Request(
-      "http://localhost:9090/users/roles"
+      "http://localhost:9090/roles"
     );
     fetch(jo, {
       headers: {
-        Authorization: "Bearer " + sessionStorage.getItem("token")
+        Authorization: "Bearer " + this.$cookies.get("token")
       }
     })
       .then(res => {
@@ -124,7 +158,11 @@ export default {
   created: function() {
     console.log("it creates");
 
-    if(sessionStorage.getItem("decoded").includes("ADMIN")){
+    if(this.$cookies.get("decoded")==null){
+      return
+    }
+
+    if(this.$cookies.get("decoded").includes("ADMIN")){
       this.isAdmin=true
     }
 
@@ -133,7 +171,7 @@ export default {
     );
     fetch(jo, {
       headers: {
-        Authorization: "Bearer " + sessionStorage.getItem("token")
+        Authorization: "Bearer " + this.$cookies.get("token")
       }
     })
       .then(res => {

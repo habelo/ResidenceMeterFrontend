@@ -65,22 +65,24 @@ export default {
       })
       .then(res => {
         if(res.status === 200){
+          this.success=true
           console.log(res)
           var token = res.headers.get("Authorization").split("Bearer ").pop()
           this.decoded = jwt_decode(token)
-          sessionStorage.setItem("decoded", this.decoded.roles)
-          sessionStorage.setItem("token", token)
-          sessionStorage.setItem("username", this.form.username)
+          this.$cookies.set("decoded", this.decoded.roles)
+          this.$cookies.set("token", token)
+          this.$cookies.set("username", this.form.username)
         } else if(res.status != 200){
           this.success=false
         }
-          return res.json()
+                  return res.json()
       }).then(data => {
         console.log("it push")
         if(this.success){
           router.push({ name: "profile"})
         }
           this.message= data.error
+          this.password= ''
         })
         .catch(err => {
           console.log(err);

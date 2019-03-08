@@ -37,11 +37,8 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 ### Vue Cookie
-
+npm install vue-cookies --save
 
 ### JWT
 npm install jsonwebtoken
 *If not JWT works from above: npm install jwt-decode
-
-### Cookies
-npm install vue-cookies --save

@@ -61,7 +61,7 @@ export default {
         body: JSON.stringify(userobj),
         headers: {
           "Content-Type": "application/json"
-        }
+          }
       })
         .then(res => {
           console.log(res);
