@@ -36,6 +36,7 @@
 
     <div>
       <b-pagination size="md" :total-rows="totalSize" v-model="page" :per-page="5"/>
+      <b-button variant="outline-primary" id="travel" @click="navigate($event.srcElement.id)">Travel</b-button>
       <b-button variant="outline-primary" id="changepw" @click="navigate($event.srcElement.id)">Change Password</b-button>
       <b-button variant="outline-primary" id="logout" @click="navigate($event.srcElement.id)">Log Out</b-button>
     </div>
@@ -90,10 +91,14 @@ export default {
       console.log(username)
       if(username!=null && username!=undefined && username!= ''){
         console.log("hej allihoppa")
-        
+        var queryString =  "http://localhost:9090/users?page=" + (this.page-1) + "&size=" + this.size + "&username="+username
+      } else {
+        var queryString = "http://localhost:9090/users?page=" + (this.page-1) + "&size=" + this.size
       }
+      console.log(queryString)
         const jo = new Request(
-        "http://localhost:9090/users?page=" + (this.page-1) + "&size=" + this.size
+        // "http://localhost:9090/users?page=" + (this.page-1) + "&size=" + this.size
+        queryString
       );
       fetch(jo, {
         headers: {
@@ -140,6 +145,9 @@ export default {
       }
       if(id=="changepw"){
         router.push({name: "changepw"})
+      }
+      if(id=="travel"){
+        router.push({name:"travel"})
       }
     }
   },
